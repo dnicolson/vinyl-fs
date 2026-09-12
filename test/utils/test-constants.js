@@ -49,6 +49,10 @@ var symlinkMultiDirpathSecond = path.join(
 );
 var symlinkNestedFirst = path.join(outputBase, './test-multi-layer-symlink');
 var symlinkNestedSecond = path.join(outputBase, './foo/baz-link.txt');
+// Used for relative symlink target tests (fix for resolveSymlinks with relative targets)
+var relativeSymlinkBase = path.join(inputBase, './relative-symlink');
+var relativeSymlinkTarget = path.join(relativeSymlinkBase, './real-file.txt');
+var relativeSymlinkSource = path.join(relativeSymlinkBase, './subdir/symlink.txt');
 // Paths that don't exist
 var neInputBase = path.join(inputBase, './not-exists/');
 var neOutputBase = path.join(outputBase, './not-exists/');
@@ -90,6 +94,9 @@ module.exports = {
   symlinkMultiDirpathSecond: symlinkMultiDirpathSecond,
   symlinkNestedFirst: symlinkNestedFirst,
   symlinkNestedSecond: symlinkNestedSecond,
+  relativeSymlinkTarget: relativeSymlinkTarget,
+  relativeSymlinkSource: relativeSymlinkSource,
+  relativeSymlinkBase: relativeSymlinkBase,
   neInputBase: neInputBase,
   neOutputBase: neOutputBase,
   neInputDirpath: neInputDirpath,

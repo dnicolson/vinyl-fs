@@ -21,6 +21,9 @@ var symlinkMultiDirpath = testConstants.symlinkMultiDirpath;
 var symlinkMultiDirpathSecond = testConstants.symlinkMultiDirpathSecond;
 var symlinkNestedFirst = testConstants.symlinkNestedFirst;
 var symlinkNestedSecond = testConstants.symlinkNestedSecond;
+var relativeSymlinkBase = testConstants.relativeSymlinkBase;
+var relativeSymlinkTarget = testConstants.relativeSymlinkTarget;
+var relativeSymlinkSource = testConstants.relativeSymlinkSource;
 
 var clean = cleanup(outputBase);
 
@@ -174,6 +177,44 @@ describeStreams('.src() with symlinks', function (stream) {
         vfs.src(symlinkNestedFirst, { resolveSymlinks: spy }),
         concatArray(assert),
       ],
+      done
+    );
+  });
+
+  it('resolves symlinks with relative targets', function (done) {
+    function assert(files) {
+      expect(files.length).toEqual(1);
+      // The path should be the symlink itself
+      expect(files[0].path).toEqual(relativeSymlinkSource);
+      // But the content should be what's in the actual file
+      expect(files[0].contents.toString()).toEqual('relative target content\n');
+      // And the stats should have been updated
+      expect(files[0].stat.isSymbolicLink()).toEqual(false);
+      expect(files[0].stat.isFile()).toEqual(true);
+    }
+
+    pipeline([vfs.src(relativeSymlinkSource), concatArray(assert)], done);
+  });
+
+  it('resolves symlinks with relative targets via glob with a cwd', function (done) {
+    function assert(files) {
+      var symlinkFile = files.find(function (file) {
+        return file.path === relativeSymlinkSource;
+      });
+      var targetFile = files.find(function (file) {
+        return file.path === relativeSymlinkTarget;
+      });
+      expect(symlinkFile).toEqual(expect.anything());
+      expect(targetFile).toEqual(expect.anything());
+      // The symlink's content should be what's in the actual file
+      expect(symlinkFile.contents.toString()).toEqual('relative target content\n');
+      // And the stats should have been updated
+      expect(symlinkFile.stat.isSymbolicLink()).toEqual(false);
+      expect(symlinkFile.stat.isFile()).toEqual(true);
+    }
+
+    pipeline(
+      [vfs.src('**', { cwd: relativeSymlinkBase }), concatArray(assert)],
       done
     );
   });
